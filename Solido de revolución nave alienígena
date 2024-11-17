@@ -1,0 +1,97 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Definir las funciones por tramos
+def funcion(x):
+    if np.isscalar(x):
+        if 0 <= x <= 0.05:
+            return 16.23 * x
+        elif 0.05 <= x <= 0.22:
+            return -26.49 * x**2 + 13.61 * x + 0.19
+        elif 0.22 <= x <= 0.38:
+            return 2.31 * x + 1.39
+        elif 0.38 <= x <= 0.64:
+            return 2.27
+        elif 0.64 <= x <= 0.76:
+            return 12.5 * x**2 - 7.09 * x + 1.71
+        elif 0.76 <= x <= 1.28:
+            return 14.38 * x**3 - 47.56 * x**2 + 55.88 * x - 17.77
+        elif 1.28 <= x <= 2.03:
+            return -1.4 * x**2 + 6.24 * x + 0.29
+        elif 2.03 <= x <= 2.43:
+            return -1.85 * x + 10.96
+        elif 2.43 <= x <= 2.88:
+            return -6.98 * x**2 + 33.31 * x - 33.31
+        elif 2.88 <= x <= 3.04:
+            return -46.03 * x**2 + 265.85 * x - 379.08
+        elif 3.04 <= x <= 3.69:
+            return -0.06 * x**2 - 0.83 * x + 6.79
+        elif 3.69 <= x <= 4.34:
+            return -5.66 * x**3 + 64.86 * x**2 - 249.3 * x + 324.1
+        elif 4.35 <= x <= 4.39:
+            return -26 * x + 114.17
+        else:
+            return np.nan  # Fuera de los límites
+    else:
+        return np.array([funcion(xi) for xi in x])  # Para arreglos
+
+# Crear listas para almacenar x e y por tramos
+x_vals = []
+y_vals = []
+
+# Definir los intervalos de las funciones para asegurarnos de que se concatenen correctamente
+intervalos = [
+    (0, 0.05),
+    (0.05, 0.22),
+    (0.22, 0.38),
+    (0.38, 0.64),
+    (0.64, 0.76),
+    (0.76, 1.28),
+    (1.28, 2.03),
+    (2.03, 2.43),
+    (2.43, 2.88),
+    (2.88, 3.04),
+    (3.04, 3.69),
+    (3.69, 4.34),
+    (4.35, 4.39)
+]
+
+# Generar los valores de x e y para cada intervalo
+for intervalo in intervalos:
+    x_tramo = np.linspace(intervalo[0], intervalo[1], 100)
+    y_tramo = funcion(x_tramo)
+    x_vals.append(x_tramo)
+    y_vals.append(y_tramo)
+
+# Concatenar todos los tramos
+x_total = np.concatenate(x_vals)
+y_total = np.concatenate(y_vals)
+
+# Crear la figura y el eje 3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Graficar la función original
+ax.plot(x_total, y_total, np.zeros_like(x_total), 'b-')
+
+# Crear la malla de revolución sobre el eje X
+theta = np.linspace(0, 2 * np.pi, 100)
+theta_grid, y_grid = np.meshgrid(theta, y_total)
+
+# Rotación sobre el eje X
+x_grid = np.tile(x_total, (100, 1)).T  # Repetir x_total
+z_grid = y_grid * np.sin(theta_grid)
+y_grid = y_grid * np.cos(theta_grid)
+
+# Graficar la superficie de revolución
+ax.plot_surface(x_grid, y_grid, z_grid, color='b', alpha=0.5)
+
+# Ajustar los ejes para mejorar la visualización
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+ax.set_title("Sólido de Revolución - Nave Alien")
+
+# Mostrar la figura
+plt.show()
